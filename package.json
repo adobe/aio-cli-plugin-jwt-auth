@@ -1,0 +1,73 @@
+{
+  "name": "@adobe/aio-cli-plugin-jwt-auth",
+  "version": "1.0.6",
+  "author": "Adobe Systems Inc.",
+  "description": "JWT Auth Plugin for the Adobe I/O CLI",
+  "bugs": "https://github.com/adobe/aio-cli-plugin-jwt-auth/issues",
+  "dependencies": {
+    "@adobe/aio-cli-plugin-config": "^1",
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/errors": "^1.1.2",
+    "jwt-simple": "^0.5.1",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1",
+    "@oclif/plugin-help": "^1",
+    "@oclif/test": "^1",
+    "chalk": "^2.4.1",
+    "eslint": "^4",
+    "eslint-config-oclif": "^1",
+    "jest": "^23.0.1",
+    "jest-junit": "^5.0.0",
+    "stdout-stderr": "^0.1.9"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/oclif.manifest.json",
+    "/src",
+    "/package-lock.json"
+  ],
+  "homepage": "https://github.com/adobe/aio-cli-plugin-jwt-auth",
+  "keywords": [
+    "oclif-plugin"
+  ],
+  "license": "Apache-2.0",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "./bin/run",
+    "devPlugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "main": "src/index.js",
+  "repository": "adobe/aio-cli-plugin-jwt-auth",
+  "scripts": {
+    "posttest": "eslint src",
+    "test": "npm run unit-tests",
+    "unit-tests": "jest --ci",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "postpack": "rm -f oclif.manifest.json",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "testPathIgnorePatterns": [
+      "<rootDir>/tests/fixtures/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/tests/fixtures/"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "testEnvironment": "node",
+    "globalSetup": "./test/fixtures/scripts/global-setup.js",
+    "globalTeardown": "./test/fixtures/scripts/global-teardown.js"
+  }
+}
