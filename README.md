@@ -25,7 +25,7 @@ $ npm install -g @adobe/aio-cli-plugin-jwt-auth
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-jwt-auth/1.0.6 darwin-x64 node-v8.9.4
+@adobe/aio-cli-plugin-jwt-auth/1.0.6 darwin-x64 node-v8.11.4
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
