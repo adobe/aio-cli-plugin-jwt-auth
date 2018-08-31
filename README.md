@@ -9,6 +9,8 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 -->
+[![Build Status](https://travis-ci.org/adobe/aio-cli-plugin-jwt-auth.svg?branch=master)](https://travis-ci.org/adobe/aio-cli-plugin-jwt-auth)
+
 aio-cli-plugin-jwt-auth
 =======================
 
