@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 -->
 [![Build Status](https://travis-ci.org/adobe/aio-cli-plugin-jwt-auth.svg?branch=master)](https://travis-ci.org/adobe/aio-cli-plugin-jwt-auth)
+[![Build status](https://ci.appveyor.com/api/projects/status/d6m0d43csd8t13vu?svg=true)](https://ci.appveyor.com/project/shazron/aio-cli-plugin-jwt-auth)
 
 aio-cli-plugin-jwt-auth
 =======================
