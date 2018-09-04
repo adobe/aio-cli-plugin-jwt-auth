@@ -28,7 +28,7 @@ $ npm install -g @adobe/aio-cli-plugin-jwt-auth
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-jwt-auth/1.0.6 darwin-x64 node-v8.11.4
+@adobe/aio-cli-plugin-jwt-auth/1.0.7 darwin-x64 node-v8.11.2
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -46,6 +46,9 @@ get the access token for the Adobe I/O Console
 ```
 USAGE
   $ ./bin/run jwt-auth:access-token
+
+OPTIONS
+  -p, --passphrase=passphrase  the passphrase for the private-key
 
 DESCRIPTION
   You must have a 'jwt-auth' key in your config, that has all your config data in .json format:
@@ -76,5 +79,5 @@ EXAMPLE
   }
 ```
 
-_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/v1.0.6/src/commands/jwt-auth/access-token.js)_
+_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/v1.0.7/src/commands/jwt-auth/access-token.js)_
 <!-- commandsstop -->
