@@ -10,14 +10,14 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const {Command} = require('@oclif/command')
+const {Command, flags} = require('@oclif/command')
 const Config = require('@adobe/aio-cli-plugin-config')
 const {validateToken, getPayload, validateConfigData} = require('../../jwt-auth-helpers')
-
-const jwt = require('jwt-simple')
+const debug = require('debug')('jwt-auth:access-token')
+const jwt = require('jsonwebtoken')
 const rp = require('request-promise-native')
 
-async function getAccessToken() {
+async function getAccessToken(passphrase) {
   const configStr = await Config.get('jwt-auth')
   if (!configStr) {
     return Promise.reject(new Error('missing config data: jwt-auth'))
@@ -42,13 +42,27 @@ async function getAccessToken() {
   // if we already have the token, validate it and return it
   const token = configData.access_token
   if (token) {
-    if (validateToken(token, privateKey)) {
+    if (validateToken(token)) {
       return Promise.resolve(token)
     }
   }
 
+  let keyParam = privateKey
+  if (passphrase) {
+    keyParam = {
+      key: privateKey,
+      passphrase,
+    }
+  }
+
   const payload = getPayload(configData) // re-set the expiry to 24 hours from now
-  const jwtToken = jwt.encode(payload, privateKey, 'RS256', null)
+  let jwtToken
+  try {
+    jwtToken = jwt.sign(payload, keyParam, {algorithm: 'RS256'}, null)
+  } catch (e) {
+    debug(e)
+    throw new Error('A passphrase is needed for your private-key. Use the --passphrase flag to specify one.')
+  }
 
   const options = {
     uri: configData.token_exchange_url,
@@ -72,9 +86,10 @@ async function getAccessToken() {
 
 class AccessTokenCommand extends Command {
   async run() {
+    const {flags} = this.parse(AccessTokenCommand)
     let token
     try {
-      token = await this.accessToken()
+      token = await this.accessToken(flags.passphrase)
     } catch (e) {
       this.error(e.message)
     }
@@ -82,9 +97,13 @@ class AccessTokenCommand extends Command {
     return token
   }
 
-  async accessToken() {
-    return getAccessToken()
+  async accessToken(passphrase) {
+    return getAccessToken(passphrase)
   }
+}
+
+AccessTokenCommand.flags = {
+  passphrase: flags.string({char: 'p', description: 'the passphrase for the private-key'}),
 }
 
 AccessTokenCommand.description = `get the access token for the Adobe I/O Console

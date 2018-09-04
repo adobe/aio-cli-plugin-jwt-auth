@@ -13,15 +13,17 @@ governing permissions and limitations under the License.
 const jwtAuthHelpers = require('../src/jwt-auth-helpers')
 const tempConfigData = require('./fixtures/config/config-sample.json')
 
-jest.mock('jwt-simple', () => {
+jest.mock('jsonwebtoken', () => {
   return {
     decode: jest.fn(token => {
       if (token === 'some_gibberish_token') {
         throw new Error('invalid token')
       } else {
         return {
-          created_at: String(Date.now()),
-          expires_in: String(Math.round((Date.now() / 1000) + (60 * 60 * 12))), // will not expire for the test
+          payload: {
+            created_at: String(Date.now()),
+            expires_in: String(Math.round((Date.now() / 1000) + (60 * 60 * 12))), // will not expire for the test
+          },
         }
       }
     }),
@@ -35,14 +37,12 @@ test('exports', () => {
 })
 
 test('validateToken', () => {
-  const configData = Object.assign({}, tempConfigData)
-  const privateKey = configData.jwt_private_key.join('\n')
   let isExpired
 
-  isExpired = jwtAuthHelpers.validateToken('some_gibberish_token', privateKey)
+  isExpired = jwtAuthHelpers.validateToken('some_gibberish_token')
   expect(isExpired).toBeFalsy()
 
-  isExpired = jwtAuthHelpers.validateToken('some_valid_token', privateKey)
+  isExpired = jwtAuthHelpers.validateToken('some_valid_token')
   expect(isExpired).toBeTruthy()
 })
 

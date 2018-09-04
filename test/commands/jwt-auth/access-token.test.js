@@ -20,7 +20,9 @@ jest.mock('request-promise-native', () => {
 const Config = require('@adobe/aio-cli-plugin-config')
 const AccessTokenCommand = require('../../../src/commands/jwt-auth/access-token')
 const mockConfigData = require('../../fixtures/config/config-sample.json')
-const jwt = require('jwt-simple')
+const mockConfigDataWithPassphrase = require('../../fixtures/config/config-sample-passphrase.json')
+const configDataPassphrase = 'password'
+const jwt = require('jsonwebtoken')
 const {stdout} = require('stdout-stderr')
 
 beforeAll(() => stdout.start())
@@ -37,7 +39,7 @@ test('valid cached token', async () => {
   payload.created_at = Math.round(Date.now())
   payload.expires_in = 1000000 // hurry!
 
-  const jwtToken = jwt.encode(payload, privateKey, 'RS256', null)
+  const jwtToken = jwt.sign(payload, privateKey, {algorithm: 'RS256'}, null)
 
   let configSpy1 = jest.spyOn(Config, 'get')
   .mockImplementation(prop => {
@@ -93,7 +95,7 @@ test('generated valid cached token', async () => {
   payload.created_at = Math.round(Date.now())
   payload.expires_in = 1000000 // hurry!
 
-  const jwtToken = jwt.encode(payload, privateKey, 'RS256', null)
+  const jwtToken = jwt.sign(payload, privateKey, {algorithm: 'RS256'}, null)
 
   let fsSpy1 = jest.spyOn(Config, 'get')
   .mockImplementation(prop => {
@@ -167,5 +169,41 @@ test('no cached access_token', async () => {
   expect(spy2).toHaveBeenCalled()
 
   let runResult = AccessTokenCommand.run([])
+  return expect(runResult).resolves.toEqual(mockAccessToken)
+})
+
+test('private-key has passphrase - passphrase not set', async () => {
+  let spy1 = jest.spyOn(Config, 'get')
+  .mockImplementation(() => {
+    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    return JSON.stringify(tempConfig)
+  })
+
+  // don't let config write our bunk data
+  let spy2 = jest.spyOn(Config, 'set')
+  .mockImplementation(() => {})
+
+  expect(spy1).toHaveBeenCalled()
+  expect(spy2).toHaveBeenCalled()
+
+  let runResult = AccessTokenCommand.run([])
+  return expect(runResult).rejects.toEqual(new Error('A passphrase is needed for your private-key. Use the --passphrase flag to specify one.'))
+})
+
+test('private-key has passphrase - passphrase set', async () => {
+  let spy1 = jest.spyOn(Config, 'get')
+  .mockImplementation(() => {
+    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    return JSON.stringify(tempConfig)
+  })
+
+  // don't let config write our bunk data
+  let spy2 = jest.spyOn(Config, 'set')
+  .mockImplementation(() => {})
+
+  expect(spy1).toHaveBeenCalled()
+  expect(spy2).toHaveBeenCalled()
+
+  let runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
   return expect(runResult).resolves.toEqual(mockAccessToken)
 })

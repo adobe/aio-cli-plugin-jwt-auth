@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const jwt = require('jwt-simple')
+const jwt = require('jsonwebtoken')
 
 function getPayload(configData) {
   const payload = configData.jwt_payload
@@ -21,10 +21,11 @@ function getPayload(configData) {
   return payload
 }
 
-function validateToken(token, privateKey) {
+function validateToken(token) {
   let isExpired = true
+
   try {
-    const decodedJWT = jwt.decode(token, privateKey, true, 'RS256')
+    const decodedJWT = jwt.decode(token, {complete: true}).payload
     const createdAt = parseInt(decodedJWT.created_at, 10)
     const expiresIn = parseInt(decodedJWT.expires_in, 10)
     const expiresAt = createdAt + expiresIn
