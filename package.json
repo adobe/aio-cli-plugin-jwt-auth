@@ -1,11 +1,11 @@
 {
   "name": "@adobe/aio-cli-plugin-jwt-auth",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "Adobe Systems Inc.",
   "description": "JWT Auth Plugin for the Adobe I/O CLI",
   "bugs": "https://github.com/adobe/aio-cli-plugin-jwt-auth/issues",
   "dependencies": {
-    "@adobe/aio-cli-plugin-config": "^1",
+    "@adobe/aio-cli-plugin-config": "^1.0.6",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.1.2",
@@ -30,8 +30,7 @@
   },
   "files": [
     "/oclif.manifest.json",
-    "/src",
-    "/package-lock.json"
+    "/src"
   ],
   "homepage": "https://github.com/adobe/aio-cli-plugin-jwt-auth",
   "keywords": [
