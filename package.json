@@ -30,8 +30,7 @@
   },
   "files": [
     "/oclif.manifest.json",
-    "/src",
-    "/package-lock.json"
+    "/src"
   ],
   "homepage": "https://github.com/adobe/aio-cli-plugin-jwt-auth",
   "keywords": [
