@@ -18,11 +18,18 @@ jest.mock('jsonwebtoken', () => {
     decode: jest.fn(token => {
       if (token === 'some_gibberish_token') {
         throw new Error('invalid token')
+      } else if (token === 'some_expired_token') {
+        return {
+          payload: {
+            created_at: String(Date.now() - 1000), // ms, in the past
+            expires_in: String(1), // 1 ms from created_at
+          },
+        }
       } else {
         return {
           payload: {
-            created_at: String(Date.now()),
-            expires_in: String(Math.round((Date.now() / 1000) + (60 * 60 * 12))), // will not expire for the test
+            created_at: String(Date.now()), // ms
+            expires_in: String(1000 * 60), // will not expire for the test (60s)
           },
         }
       }
@@ -40,6 +47,9 @@ test('validateToken', () => {
   let isExpired
 
   isExpired = jwtAuthHelpers.validateToken('some_gibberish_token')
+  expect(isExpired).toBeFalsy()
+
+  isExpired = jwtAuthHelpers.validateToken('some_expired_token')
   expect(isExpired).toBeFalsy()
 
   isExpired = jwtAuthHelpers.validateToken('some_valid_token')

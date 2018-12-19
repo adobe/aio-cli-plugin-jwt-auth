@@ -15,7 +15,7 @@ const jwt = require('jsonwebtoken')
 function getPayload(configData) {
   const payload = configData.jwt_payload
   if (payload) {
-    // always set to expire 24 hours in the future
+    // always set to expire 12 hours in the future (exp is in seconds)
     payload.exp = Math.round((Date.now() / 1000) + (60 * 60 * 12))
   }
   return payload
@@ -26,10 +26,10 @@ function validateToken(token) {
 
   try {
     const decodedJWT = jwt.decode(token, {complete: true}).payload
-    const createdAt = parseInt(decodedJWT.created_at, 10)
-    const expiresIn = parseInt(decodedJWT.expires_in, 10)
+    const createdAt = parseInt(decodedJWT.created_at, 10) // ms
+    const expiresIn = parseInt(decodedJWT.expires_in, 10) // ms
     const expiresAt = createdAt + expiresIn
-    isExpired = expiresAt < (Date.now() / 1000)
+    isExpired = expiresAt < Date.now()
   } catch (e) {
     isExpired = true
   }
