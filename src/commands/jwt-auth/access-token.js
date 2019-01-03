@@ -59,8 +59,8 @@ async function getAccessToken(passphrase) {
   let jwtToken
   try {
     jwtToken = jwt.sign(payload, keyParam, {algorithm: 'RS256'}, null)
-  } catch (e) {
-    debug(e)
+  } catch (error) {
+    debug(error)
     throw new Error('A passphrase is needed for your private-key. Use the --passphrase flag to specify one.')
   }
 
@@ -90,8 +90,8 @@ class AccessTokenCommand extends Command {
     let token
     try {
       token = await this.accessToken(flags.passphrase)
-    } catch (e) {
-      this.error(e.message)
+    } catch (error) {
+      this.error(error.message)
     }
     this.log(token)
     return token

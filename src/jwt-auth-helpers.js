@@ -30,7 +30,7 @@ function validateToken(token) {
     const expiresIn = parseInt(decodedJWT.expires_in, 10) // ms
     const expiresAt = createdAt + expiresIn
     isExpired = expiresAt < Date.now()
-  } catch (e) {
+  } catch (error) {
     isExpired = true
   }
   return !isExpired
