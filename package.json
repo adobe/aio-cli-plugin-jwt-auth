@@ -6,6 +6,7 @@
   "bugs": "https://github.com/adobe/aio-cli-plugin-jwt-auth/issues",
   "dependencies": {
     "@adobe/aio-cli-plugin-config": "^1.0.6",
+    "@adobe/oclif-base-index-command": "^1.0.2",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.1.2",
@@ -42,13 +43,18 @@
     "bin": "./bin/run",
     "devPlugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "topics": {
+      "jwt-auth": {
+        "description": "Gets the access token for an integration for the Adobe I/O Runtime"
+      }
+    }
   },
   "main": "src/index.js",
   "repository": "adobe/aio-cli-plugin-jwt-auth",
   "scripts": {
-    "posttest": "eslint src",
-    "test": "npm run unit-tests",
+    "test": "npm run eslint && npm run unit-tests",
+    "eslint": "eslint src test",
     "unit-tests": "jest --ci",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
