@@ -22,7 +22,7 @@
     "chalk": "^2.4.1",
     "eslint": "^5.9.0",
     "eslint-config-oclif": "^3.1.0",
-    "jest": "^23.0.1",
+    "jest": "^24.1.0",
     "jest-junit": "^6.0.0",
     "stdout-stderr": "^0.1.9"
   },
@@ -73,7 +73,9 @@
       "jest-junit"
     ],
     "testEnvironment": "node",
-    "setupTestFrameworkScriptFile": "./jest.setup.js",
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ],
     "globalSetup": "./test/fixtures/scripts/global-setup.js",
     "globalTeardown": "./test/fixtures/scripts/global-teardown.js"
   }
