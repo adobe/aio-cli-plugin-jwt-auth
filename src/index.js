@@ -13,5 +13,5 @@ governing permissions and limitations under the License.
 const AccessTokenCommand = require('./commands/jwt-auth/access-token')
 
 module.exports = {
-  accessToken: new AccessTokenCommand().accessToken,
+  accessToken: new AccessTokenCommand().accessToken
 }

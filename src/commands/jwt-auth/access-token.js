@@ -10,14 +10,14 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 const Config = require('@adobe/aio-cli-plugin-config')
-const {validateToken, getPayload, validateConfigData} = require('../../jwt-auth-helpers')
+const { validateToken, getPayload, validateConfigData } = require('../../jwt-auth-helpers')
 const debug = require('debug')('jwt-auth:access-token')
 const jwt = require('jsonwebtoken')
 const rp = require('request-promise-native')
 
-async function getAccessToken(passphrase) {
+async function getAccessToken (passphrase) {
   const configStr = await Config.get('jwt-auth')
   if (!configStr) {
     return Promise.reject(new Error('missing config data: jwt-auth'))
@@ -51,14 +51,14 @@ async function getAccessToken(passphrase) {
   if (passphrase) {
     keyParam = {
       key: privateKey,
-      passphrase,
+      passphrase
     }
   }
 
   const payload = getPayload(configData) // re-set the expiry to 24 hours from now
   let jwtToken
   try {
-    jwtToken = jwt.sign(payload, keyParam, {algorithm: 'RS256'}, null)
+    jwtToken = jwt.sign(payload, keyParam, { algorithm: 'RS256' }, null)
   } catch (error) {
     debug(error)
     throw new Error('A passphrase is needed for your private-key. Use the --passphrase flag to specify one.')
@@ -70,23 +70,23 @@ async function getAccessToken(passphrase) {
     form: {
       client_id: configData.client_id,
       client_secret: configData.client_secret,
-      jwt_token: jwtToken,
+      jwt_token: jwtToken
     },
-    json: true,
+    json: true
   }
 
   return rp(options)
-  .then(async authTokenResult => {
+    .then(async authTokenResult => {
     // store our new token in config
-    configData.access_token = authTokenResult.access_token
-    await Config.set('jwt-auth', JSON.stringify(configData))
-    return authTokenResult.access_token
-  })
+      configData.access_token = authTokenResult.access_token
+      await Config.set('jwt-auth', JSON.stringify(configData))
+      return authTokenResult.access_token
+    })
 }
 
 class AccessTokenCommand extends Command {
-  async run() {
-    const {flags} = this.parse(AccessTokenCommand)
+  async run () {
+    const { flags } = this.parse(AccessTokenCommand)
     let token
     try {
       token = await this.accessToken(flags.passphrase)
@@ -97,13 +97,13 @@ class AccessTokenCommand extends Command {
     return token
   }
 
-  async accessToken(passphrase) {
+  async accessToken (passphrase) {
     return getAccessToken(passphrase)
   }
 }
 
 AccessTokenCommand.flags = {
-  passphrase: flags.string({char: 'p', description: 'the passphrase for the private-key'}),
+  passphrase: flags.string({ char: 'p', description: 'the passphrase for the private-key' })
 }
 
 AccessTokenCommand.description = `get the access token for the Adobe I/O Console
@@ -134,7 +134,7 @@ jwt_auth:
   "console_get_orgs_url":"...",
   "console_get_namespaces_url":"..."
 }
-  `,
+  `
 ]
 
 module.exports = AccessTokenCommand

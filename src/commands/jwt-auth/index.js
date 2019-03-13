@@ -21,7 +21,7 @@ JwtAuthCommand.description = 'Gets the access token for an integration for the A
 
 JwtAuthCommand.examples = [
   '$ aio jwt-auth:access-token',
-  '$ aio jwt-auth access-token',
+  '$ aio jwt-auth access-token'
 ]
 
 module.exports = JwtAuthCommand

@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const jwt = require('jsonwebtoken')
 
-function getPayload(configData) {
+function getPayload (configData) {
   const payload = configData.jwt_payload
   if (payload) {
     // always set to expire 12 hours in the future (exp is in seconds)
@@ -21,11 +21,11 @@ function getPayload(configData) {
   return payload
 }
 
-function validateToken(token) {
+function validateToken (token) {
   let isExpired = true
 
   try {
-    const decodedJWT = jwt.decode(token, {complete: true}).payload
+    const decodedJWT = jwt.decode(token, { complete: true }).payload
     const createdAt = parseInt(decodedJWT.created_at, 10) // ms
     const expiresIn = parseInt(decodedJWT.expires_in, 10) // ms
     const expiresAt = createdAt + expiresIn
@@ -36,7 +36,7 @@ function validateToken(token) {
   return !isExpired
 }
 
-function validateConfigData(configData) {
+function validateConfigData (configData) {
   if (!configData) {
     return null
   }
@@ -56,5 +56,5 @@ function validateConfigData(configData) {
 module.exports = {
   validateToken,
   getPayload,
-  validateConfigData,
+  validateConfigData
 }

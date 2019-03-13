@@ -22,18 +22,18 @@ jest.mock('jsonwebtoken', () => {
         return {
           payload: {
             created_at: String(Date.now() - 1000), // ms, in the past
-            expires_in: String(1), // 1 ms from created_at
-          },
+            expires_in: String(1) // 1 ms from created_at
+          }
         }
       } else {
         return {
           payload: {
             created_at: String(Date.now()), // ms
-            expires_in: String(1000 * 60), // will not expire for the test (60s)
-          },
+            expires_in: String(1000 * 60) // will not expire for the test (60s)
+          }
         }
       }
-    }),
+    })
   }
 })
 

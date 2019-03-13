@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const mockAccessToken = 'asdasdasd'
 jest.mock('request-promise-native', () => {
   return function () {
-    return Promise.resolve({access_token: mockAccessToken})
+    return Promise.resolve({ access_token: mockAccessToken })
   }
 })
 
@@ -23,10 +23,6 @@ const mockConfigData = require('../../fixtures/config/config-sample.json')
 const mockConfigDataWithPassphrase = require('../../fixtures/config/config-sample-passphrase.json')
 const configDataPassphrase = 'password'
 const jwt = require('jsonwebtoken')
-const {stdout} = require('stdout-stderr')
-
-beforeAll(() => stdout.start())
-afterAll(() => stdout.stop())
 
 /**
  * Test: when we have a valid cached access-token we should just use it.
@@ -39,20 +35,20 @@ test('valid cached token', async () => {
   payload.created_at = Math.round(Date.now())
   payload.expires_in = 1000000 // hurry!
 
-  const jwtToken = jwt.sign(payload, privateKey, {algorithm: 'RS256'}, null)
+  const jwtToken = jwt.sign(payload, privateKey, { algorithm: 'RS256' }, null)
 
   let configSpy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(prop => {
-    if (prop === 'jwt-auth') {
-      let tempConfig = Object.assign({}, mockConfigData)
-      tempConfig.access_token = jwtToken
-      return JSON.stringify(tempConfig)
-    }
-  })
+    .mockImplementation(prop => {
+      if (prop === 'jwt-auth') {
+        let tempConfig = Object.assign({}, mockConfigData)
+        tempConfig.access_token = jwtToken
+        return JSON.stringify(tempConfig)
+      }
+    })
 
   // don't let config write our bunk data
   let configSpy2 = jest.spyOn(Config, 'set')
-  .mockImplementation(() => {})
+    .mockImplementation(() => {})
 
   let runResult = AccessTokenCommand.run([])
   expect.assertions(4)
@@ -67,15 +63,15 @@ test('valid cached token', async () => {
 
 test('invalid cached token', async () => {
   let spy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
-    tempConfig.access_token = 'not valid'
-    return JSON.stringify(tempConfig)
-  })
+    .mockImplementation(() => {
+      let tempConfig = Object.assign({}, mockConfigData)
+      tempConfig.access_token = 'not valid'
+      return JSON.stringify(tempConfig)
+    })
 
   // don't let config write our bunk data
   let spy2 = jest.spyOn(Config, 'set')
-  .mockImplementation(() => {})
+    .mockImplementation(() => {})
 
   let runResult = AccessTokenCommand.run([])
   expect.assertions(4)
@@ -95,16 +91,16 @@ test('generated valid cached token', async () => {
   payload.created_at = Math.round(Date.now())
   payload.expires_in = 1000000 // hurry!
 
-  const jwtToken = jwt.sign(payload, privateKey, {algorithm: 'RS256'}, null)
+  const jwtToken = jwt.sign(payload, privateKey, { algorithm: 'RS256' }, null)
 
   let fsSpy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(prop => {
-    if (prop === 'jwt-auth') {
-      let tempConfig = Object.assign({}, mockConfigData)
-      tempConfig.access_token = jwtToken
-      return JSON.stringify(tempConfig)
-    }
-  })
+    .mockImplementation(prop => {
+      if (prop === 'jwt-auth') {
+        let tempConfig = Object.assign({}, mockConfigData)
+        tempConfig.access_token = jwtToken
+        return JSON.stringify(tempConfig)
+      }
+    })
 
   // don't let config write our bunk data
   jest.spyOn(Config, 'set')
@@ -132,20 +128,7 @@ test('config missing key in jwt-auth key', async () => {
   jest.spyOn(Config, 'get').mockImplementation(() => {
     return {
       'jwt-auth': {
-      },
-    }
-  })
-
-  let runResult = AccessTokenCommand.run([])
-  return expect(runResult).rejects.toEqual(
-    new Error('missing config data: jwt_private_key, jwt_payload, client_id, client_secret, token_exchange_url'))
-})
-
-test('config missing key in jwt-auth key', async () => {
-  jest.spyOn(Config, 'get').mockImplementation(() => {
-    return {
-      'jwt-auth': {
-      },
+      }
     }
   })
 
@@ -156,14 +139,14 @@ test('config missing key in jwt-auth key', async () => {
 
 test('no cached access_token', async () => {
   let spy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
-    return JSON.stringify(tempConfig)
-  })
+    .mockImplementation(() => {
+      let tempConfig = Object.assign({}, mockConfigData)
+      return JSON.stringify(tempConfig)
+    })
 
   // don't let config write our bunk data
   let spy2 = jest.spyOn(Config, 'set')
-  .mockImplementation(() => {})
+    .mockImplementation(() => {})
 
   expect(spy1).toHaveBeenCalled()
   expect(spy2).toHaveBeenCalled()
@@ -174,14 +157,14 @@ test('no cached access_token', async () => {
 
 test('private-key has passphrase - passphrase not set', async () => {
   let spy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
-    return JSON.stringify(tempConfig)
-  })
+    .mockImplementation(() => {
+      let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+      return JSON.stringify(tempConfig)
+    })
 
   // don't let config write our bunk data
   let spy2 = jest.spyOn(Config, 'set')
-  .mockImplementation(() => {})
+    .mockImplementation(() => {})
 
   expect(spy1).toHaveBeenCalled()
   expect(spy2).toHaveBeenCalled()
@@ -192,14 +175,14 @@ test('private-key has passphrase - passphrase not set', async () => {
 
 test('private-key has passphrase - passphrase set', async () => {
   let spy1 = jest.spyOn(Config, 'get')
-  .mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
-    return JSON.stringify(tempConfig)
-  })
+    .mockImplementation(() => {
+      let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+      return JSON.stringify(tempConfig)
+    })
 
   // don't let config write our bunk data
   let spy2 = jest.spyOn(Config, 'set')
-  .mockImplementation(() => {})
+    .mockImplementation(() => {})
 
   expect(spy1).toHaveBeenCalled()
   expect(spy2).toHaveBeenCalled()
