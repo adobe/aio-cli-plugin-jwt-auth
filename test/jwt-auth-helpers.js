@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const jwtAuthHelpers = require('../src/jwt-auth-helpers')
-const tempConfigData = require('./fixtures/config/config-sample.json')
+const tempConfigData = require('./__fixtures__/config/config-sample.json')
 
 jest.mock('jsonwebtoken', () => {
   return {
@@ -64,10 +64,10 @@ test('validateConfigData', () => {
   invalidKeys = jwtAuthHelpers.validateConfigData(configData)
   expect(invalidKeys.length).toEqual(0)
 
-  delete configData.token_exchange_url
+  delete configData.client_id
   invalidKeys = jwtAuthHelpers.validateConfigData(configData)
   expect(invalidKeys.length).toEqual(1)
-  expect(invalidKeys[0]).toEqual('token_exchange_url')
+  expect(invalidKeys[0]).toEqual('client_id')
 
   configData = null
   invalidKeys = jwtAuthHelpers.validateConfigData(configData)

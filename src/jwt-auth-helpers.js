@@ -42,7 +42,7 @@ function validateConfigData (configData) {
   }
 
   const result = []
-  const keys = ['jwt_private_key', 'jwt_payload', 'client_id', 'client_secret', 'token_exchange_url']
+  const keys = ['jwt_private_key', 'jwt_payload', 'client_id', 'client_secret']
 
   keys.forEach(key => {
     if (!configData[key]) {
