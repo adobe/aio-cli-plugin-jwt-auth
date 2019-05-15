@@ -11,24 +11,20 @@ governing permissions and limitations under the License.
 */
 
 const { Command, flags } = require('@oclif/command')
-const Config = require('@adobe/aio-cli-plugin-config')
+const config = require('@adobe/aio-cli-config')
 const { validateToken, getPayload, validateConfigData } = require('../../jwt-auth-helpers')
-const debug = require('debug')('jwt-auth:access-token')
+const debug = require('debug')('aio-cli-plugin-jwt-auth')
 const jwt = require('jsonwebtoken')
-const rp = require('request-promise-native')
+const fetch = require('node-fetch')
+const { cli } = require('cli-ux')
+const fs = require('fs')
+const { URLSearchParams } = require('url')
 
-async function getAccessToken (passphrase) {
-  const configStr = await Config.get('jwt-auth')
-  if (!configStr) {
+async function getAccessToken (passphrase = '', force, prompt) {
+  const configData = config.get('jwt-auth')
+
+  if (!configData) {
     return Promise.reject(new Error('missing config data: jwt-auth'))
-  }
-
-  // this is temporary, the way we used to import data resulted in stringified objects being stored
-  // the better way is to store the actual object, but it requires changes elsewhere and
-  // it should all be done at once.
-  let configData = configStr
-  if (typeof configStr === 'string') {
-    configData = JSON.parse(configStr)
   }
 
   const validateConfigResults = validateConfigData(configData)
@@ -36,79 +32,113 @@ async function getAccessToken (passphrase) {
     return Promise.reject(new Error(`missing config data: ${validateConfigResults.join(', ')}`))
   }
 
-  // the private key was saved line by line in an array
-  const privateKey = configData.jwt_private_key.join('\n')
+  let token = configData.access_token
+  let expires = configData.access_token_expiry
 
-  // if we already have the token, validate it and return it
-  const token = configData.access_token
-  if (token) {
+  if (!force && token) {
     if (validateToken(token)) {
-      return Promise.resolve(token)
+      return Promise.resolve({ expires, token })
     }
   }
 
-  let keyParam = privateKey
-  if (passphrase) {
-    keyParam = {
-      key: privateKey,
-      passphrase
+  let privateKey = configData.jwt_private_key
+  if (privateKey.constructor === Array) {
+    privateKey = configData.jwt_private_key.join('\n')
+  } else if (typeof privateKey === 'string' && !privateKey.match(/^----/)) {
+    try {
+      privateKey = fs.readFileSync(configData.jwt_private_key, 'utf-8')
+    } catch (e) {
+      debug(e)
+      throw new Error(`Cannot load private key: ${configData.jwt_private_key}`)
     }
+  }
+
+  let keyParam = {
+    key: privateKey,
+    passphrase
   }
 
   const payload = getPayload(configData) // re-set the expiry to 24 hours from now
+
   let jwtToken
   try {
-    jwtToken = jwt.sign(payload, keyParam, { algorithm: 'RS256' }, null)
+    jwtToken = getToken(payload, keyParam)
+  } catch (e) {
+    if (!prompt) {
+      throw new Error('Passphrase is incorrect.')
+    }
+    keyParam.passphrase = await cli.prompt('Private key passphrase', { type: 'hide' })
+    try {
+      jwtToken = getToken(payload, keyParam)
+    } catch (e) {
+      throw new Error('Passphrase is incorrect.')
+    }
+  }
+
+  const uri = configData.token_exchange_url || 'https://ims-na1.adobelogin.com/ims/exchange/jwt/'
+  const body = new URLSearchParams()
+  body.append('client_id', configData.client_id)
+  body.append('client_secret', configData.client_secret)
+  body.append('jwt_token', jwtToken)
+
+  debug(`fetch: ${uri}`)
+  return fetch(uri, { method: 'POST', body })
+    .then(async res => {
+      if (res.ok) return res.json()
+      else throw new Error(`Cannot get token from ${uri} (${res.status} ${res.statusText})`)
+    })
+    .then(body => {
+      let expires = (new Date(Date.now() + body.expires_in)).toString()
+      config.set('jwt-auth.access_token', body.access_token)
+      config.set('jwt-auth.access_token_expiry', expires)
+      return { expires, token: body.access_token }
+    })
+}
+
+const getToken = (payload, keyParam) => {
+  try {
+    return jwt.sign(payload, keyParam, { algorithm: 'RS256' }, null)
   } catch (error) {
     debug(error)
-    throw new Error('A passphrase is needed for your private-key. Use the --passphrase flag to specify one.')
+    throw error
   }
-
-  const options = {
-    uri: configData.token_exchange_url,
-    method: 'POST',
-    form: {
-      client_id: configData.client_id,
-      client_secret: configData.client_secret,
-      jwt_token: jwtToken
-    },
-    json: true
-  }
-
-  return rp(options)
-    .then(async authTokenResult => {
-    // store our new token in config
-      configData.access_token = authTokenResult.access_token
-      await Config.set('jwt-auth', JSON.stringify(configData))
-      return authTokenResult.access_token
-    })
 }
 
 class AccessTokenCommand extends Command {
   async run () {
     const { flags } = this.parse(AccessTokenCommand)
-    let token
+    let data
     try {
-      token = await this.accessToken(flags.passphrase)
+      data = await getAccessToken(flags.passphrase, flags.force, !flags['no-prompt'] || flags.passphrase)
     } catch (error) {
       this.error(error.message)
     }
-    this.log(token)
-    return token
+    if (flags.bare) {
+      this.log(data.token)
+    } else {
+      let expiryRange = ((new Date(data.expires) - Date.now()) / 1000 / 60 / 60).toFixed(2)
+      this.log(`Access Token: ${data.token}`)
+      this.log(`Expiry: ${data.expires} (${expiryRange} hrs)`)
+    }
+    return data.token
   }
 
-  async accessToken (passphrase) {
-    return getAccessToken(passphrase)
+  async accessToken (passphrase, force, prompt = false) {
+    return getAccessToken(passphrase, force, prompt)
+      .then(data => data.token)
   }
 }
 
 AccessTokenCommand.flags = {
-  passphrase: flags.string({ char: 'p', description: 'the passphrase for the private-key' })
+  passphrase: flags.string({ char: 'p', env: 'PASSPHRASE', description: 'the passphrase for the private-key' }),
+  force: flags.boolean({ char: 'f', description: 'get a new access token' }),
+  bare: flags.boolean({ char: 'b', description: 'print access token only' }),
+  'no-prompt': flags.boolean({ description: 'do not promp for passphrase' })
 }
 
 AccessTokenCommand.description = `get the access token for the Adobe I/O Console
 You must have a 'jwt-auth' key in your config, that has all your config data in .json format:
-    aio config:set jwt-auth path/to/your/config.json --file --mime-type=application/json
+    aio config set jwt-auth --json --file path/to/your/config.json
 `
 
 AccessTokenCommand.examples = [
@@ -116,23 +146,14 @@ AccessTokenCommand.examples = [
 jwt_auth:
 {
   "client_id": "...",
-  "client_secret": "...",
-  "token_exchange_url": "...",
+  "client_secret": "..."
   "jwt_payload": {
     "iss": "...",
     "sub": "...",
     "...": true,
     "aud": "..."
   },
-  "jwt_private_key": [
-    "-----BEGIN RSA PRIVATE KEY-----",
-    "...",
-    "...",
-    "...==",
-    "-----END RSA PRIVATE KEY-----"
-  ],
-  "console_get_orgs_url":"...",
-  "console_get_namespaces_url":"..."
+  "jwt_private_key": "/path/to/cert"
 }
   `
 ]

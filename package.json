@@ -5,15 +5,13 @@
   "description": "JWT Auth Plugin for the Adobe I/O CLI",
   "bugs": "https://github.com/adobe/aio-cli-plugin-jwt-auth/issues",
   "dependencies": {
-    "@adobe/aio-cli-plugin-config": "^1.0.6",
-    "@adobe/oclif-base-index-command": "^1.0.2",
+    "@adobe/aio-cli-config": "^1.0.7",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/errors": "^1.1.2",
     "debug": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
-    "request": "^2.87.0",
-    "request-promise-native": "^1.0.5"
+    "node-fetch": "^2.3.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.21.3",
@@ -64,30 +62,11 @@
   "repository": "adobe/aio-cli-plugin-jwt-auth",
   "scripts": {
     "test": "npm run unit-tests",
-    "posttest": "npm run eslint",
+    "pretest": "npm run eslint",
     "eslint": "eslint src test",
     "unit-tests": "jest --ci",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "testPathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./test/jest.setup.js"
-    ],
-    "globalSetup": "./test/fixtures/scripts/global-setup.js",
-    "globalTeardown": "./test/fixtures/scripts/global-teardown.js"
   }
 }

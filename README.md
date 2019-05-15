@@ -33,7 +33,7 @@ $ npm install -g @adobe/aio-cli-plugin-jwt-auth
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-jwt-auth/1.0.9 darwin-x64 node-v8.11.2
+@adobe/aio-cli-plugin-jwt-auth/1.1.0-rc1 darwin-x64 node-v8.10.0
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -42,7 +42,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`./bin/run jwt-auth:access-token`](#bin-run-jwt-authaccess-token)
+* [`./bin/run jwt-auth:access-token`](#binrun-jwt-authaccess-token)
 
 ## `./bin/run jwt-auth:access-token`
 
@@ -53,36 +53,30 @@ USAGE
   $ ./bin/run jwt-auth:access-token
 
 OPTIONS
+  -b, --bare                   print access token only
+  -f, --force                  get a new access token
   -p, --passphrase=passphrase  the passphrase for the private-key
+  --no-prompt                  do not promp for passphrase
 
 DESCRIPTION
   You must have a 'jwt-auth' key in your config, that has all your config data in .json format:
-       aio config:set jwt-auth path/to/your/config.json --file --mime-type=application/json
+       aio config set jwt-auth --json --file path/to/your/config.json
 
 EXAMPLE
 
   jwt_auth:
   {
      "client_id": "...",
-     "client_secret": "...",
-     "token_exchange_url": "...",
+     "client_secret": "..."
      "jwt_payload": {
        "iss": "...",
        "sub": "...",
        "...": true,
        "aud": "..."
      },
-     "jwt_private_key": [
-       "-----BEGIN RSA PRIVATE KEY-----",
-       "...",
-       "...",
-       "...==",
-       "-----END RSA PRIVATE KEY-----"
-     ],
-     "console_get_orgs_url":"...",
-     "console_get_namespaces_url":"..."
+     "jwt_private_key": "/path/to/cert"
   }
 ```
 
-_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/v1.0.9/src/commands/jwt-auth/access-token.js)_
+_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/v1.1.0-rc1/src/commands/jwt-auth/access-token.js)_
 <!-- commandsstop -->
