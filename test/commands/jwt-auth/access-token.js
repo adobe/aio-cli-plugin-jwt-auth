@@ -133,9 +133,9 @@ test('uses key filepath', async () => {
 })
 
 test('uses key raw test', async () => {
-  config.get.mockImplementation(() => {
+  config.get.mockImplementation(key => {
     let tempConfig = Object.assign({}, mockConfigData)
-    tempConfig.jwt_private_key = fs.readFileSync('./test/__fixtures__/fake_cert')
+    tempConfig.jwt_private_key = fs.readFileSync('./test/__fixtures__/fake_cert', 'utf-8')
     return tempConfig
   })
 
@@ -147,6 +147,25 @@ test('uses key raw test', async () => {
     expect(config.get).toHaveBeenCalled()
     expect(config.set).toHaveBeenCalled()
   })
+})
+
+test('uses key raw test - cert not found', async (done) => {
+  config.get.mockImplementation(key => {
+    let tempConfig = Object.assign({}, mockConfigData)
+    tempConfig.jwt_private_key = './test/__fixtures__/non_existent_cert'
+    return tempConfig
+  })
+
+  let runResult = AccessTokenCommand.run([])
+
+  expect(runResult instanceof Promise).toBeTruthy()
+  return runResult
+    .then(() => done.fail())
+    .catch(res => {
+      expect(res).toEqual(new Error('Cannot load private key: ./test/__fixtures__/non_existent_cert'))
+      expect(config.get).toHaveBeenCalled()
+      done()
+    })
 })
 
 test('uses key filepath but no file', async (done) => {
@@ -296,15 +315,21 @@ test('fetch failure', async (done) => {
     return tempConfig
   })
 
-  mockResult = Promise.resolve({
+  const response = {
     ok: false,
     status: 404,
-    statusText: 'Not Found'
-  })
+    statusText: 'Not Found',
+    json: () => ({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found'
+    })
+  }
+  mockResult = Promise.resolve(response)
 
   let runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
   return runResult.then(done.fail).catch(err => {
-    expect(err).toEqual(new Error('Cannot get token from https://fake.site/ (404 Not Found)'))
+    expect(err.message).toEqual('Cannot get token for url \'https://fake.site\': (404 Not Found)')
     done()
   })
 })

@@ -11,14 +11,52 @@ governing permissions and limitations under the License.
 */
 
 const jwt = require('jsonwebtoken')
+const debug = require('debug')('aio-cli-plugin-jwt-auth')
+const fs = require('fs')
+const { URL } = require('url')
 
-function getPayload (configData) {
+const defaultTokenExchangeUrl = 'https://ims-na1.adobelogin.com/ims/exchange/jwt/'
+
+function createJwtAuthConfig (configData, passphrase) {
   const payload = configData.jwt_payload
-  if (payload) {
-    // always set to expire 12 hours in the future (exp is in seconds)
-    payload.exp = Math.round((Date.now() / 1000) + (60 * 60 * 12))
+  if (!payload) {
+    return
   }
-  return payload
+
+  let config = {
+    orgId: payload.iss,
+    technicalAccountId: payload.sub,
+    clientId: configData.client_id,
+    clientSecret: configData.client_secret
+  }
+
+  const tokenUrl = new URL(configData.token_exchange_url || defaultTokenExchangeUrl)
+  config.ims = `${tokenUrl.protocol}//${tokenUrl.host}`
+
+  // add metascopes
+  config.metaScopes = Object.keys(payload).filter(key => key.startsWith('http') && payload[key] === true)
+
+  // add private key
+  config.privateKey = configData.jwt_private_key
+  if (config.privateKey.constructor === Array) {
+    config.privateKey = {
+      key: configData.jwt_private_key.join('\n'),
+      passphrase
+    }
+  } else if (typeof config.privateKey === 'string' && !config.privateKey.match(/^----/)) {
+    try {
+      config.privateKey = {
+        key: fs.readFileSync(configData.jwt_private_key, 'utf-8'),
+        passphrase
+      }
+    } catch (e) {
+      debug(e)
+      throw new Error(`Cannot load private key: ${configData.jwt_private_key}`)
+    }
+  }
+
+  debug('JWT Config:', config)
+  return config
 }
 
 function validateToken (token) {
@@ -55,6 +93,6 @@ function validateConfigData (configData) {
 
 module.exports = {
   validateToken,
-  getPayload,
+  createJwtAuthConfig,
   validateConfigData
 }

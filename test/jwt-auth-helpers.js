@@ -40,7 +40,7 @@ jest.mock('jsonwebtoken', () => {
 test('exports', () => {
   expect(typeof jwtAuthHelpers.validateToken).toEqual('function')
   expect(typeof jwtAuthHelpers.validateConfigData).toEqual('function')
-  expect(typeof jwtAuthHelpers.getPayload).toEqual('function')
+  expect(typeof jwtAuthHelpers.createJwtAuthConfig).toEqual('function')
 })
 
 test('validateToken', () => {
@@ -74,16 +74,22 @@ test('validateConfigData', () => {
   expect(invalidKeys).toBeFalsy()
 })
 
-test('getPayload', () => {
+test('createJwtAuthConfig', () => {
   let configData
-  let payload
+  let config
 
   configData = Object.assign({}, tempConfigData)
-  payload = jwtAuthHelpers.getPayload(configData)
-  expect(payload).toBeDefined()
-  expect(payload.exp).toBeLessThanOrEqual(Math.round((Date.now() / 1000) + (60 * 60 * 12)))
+  config = jwtAuthHelpers.createJwtAuthConfig(configData, 'mypassphrase')
+  expect(config).toBeDefined()
+  expect(config.orgId).toBeDefined()
+  expect(config.technicalAccountId).toBeDefined()
+  expect(config.clientId).toBeDefined()
+  expect(config.clientSecret).toBeDefined()
+  expect(config.privateKey).toBeDefined()
+  expect(config.privateKey.key).toBeDefined()
+  expect(config.privateKey.passphrase).toBeDefined()
 
   configData = {}
-  payload = jwtAuthHelpers.getPayload(configData)
-  expect(payload).toBeUndefined()
+  config = jwtAuthHelpers.createJwtAuthConfig(configData)
+  expect(config).toBeUndefined()
 })
