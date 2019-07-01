@@ -315,21 +315,21 @@ test('fetch failure', async (done) => {
     return tempConfig
   })
 
-  const response = {
+  const obj = {
     ok: false,
     status: 404,
-    statusText: 'Not Found',
-    json: () => ({
-      ok: false,
-      status: 404,
-      statusText: 'Not Found'
-    })
+    statusText: 'Not Found'
+  }
+
+  const response = {
+    ...obj,
+    json: () => obj
   }
   mockResult = Promise.resolve(response)
 
   let runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
   return runResult.then(done.fail).catch(err => {
-    expect(err.message).toEqual('Cannot get token for url \'https://fake.site\': (404 Not Found)')
+    expect(err.message).toEqual(`An unknown error occurred while swapping jwt. The response is as follows: ${JSON.stringify(obj)}`)
     done()
   })
 })

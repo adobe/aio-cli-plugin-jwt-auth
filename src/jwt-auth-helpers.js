@@ -39,16 +39,12 @@ function createJwtAuthConfig (configData, passphrase) {
   // add private key
   config.privateKey = configData.jwt_private_key
   if (config.privateKey.constructor === Array) {
-    config.privateKey = {
-      key: configData.jwt_private_key.join('\n'),
-      passphrase
-    }
+    config.privateKey = configData.jwt_private_key.join('\n')
+    config.passphrase = passphrase
   } else if (typeof config.privateKey === 'string' && !config.privateKey.match(/^----/)) {
     try {
-      config.privateKey = {
-        key: fs.readFileSync(configData.jwt_private_key, 'utf-8'),
-        passphrase
-      }
+      config.privateKey = fs.readFileSync(configData.jwt_private_key, 'utf-8')
+      config.passphrase = passphrase
     } catch (e) {
       debug(e)
       throw new Error(`Cannot load private key: ${configData.jwt_private_key}`)

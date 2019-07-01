@@ -67,8 +67,6 @@ async function getAccessToken (passphrase = '', force, prompt) {
       } catch (e) {
         throw new Error('Passphrase is incorrect.')
       }
-    } else if (obj.statusText && obj.status) {
-      throw new Error(`Cannot get token for url '${jwtConfig.ims}': (${obj.status} ${obj.statusText})`)
     }
 
     throw obj

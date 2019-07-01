@@ -86,8 +86,8 @@ test('createJwtAuthConfig', () => {
   expect(config.clientId).toBeDefined()
   expect(config.clientSecret).toBeDefined()
   expect(config.privateKey).toBeDefined()
-  expect(config.privateKey.key).toBeDefined()
-  expect(config.privateKey.passphrase).toBeDefined()
+  expect(config.privateKey).toBeDefined()
+  expect(config.passphrase).toBeDefined()
 
   configData = {}
   config = jwtAuthHelpers.createJwtAuthConfig(configData)
