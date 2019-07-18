@@ -49,6 +49,7 @@ test('valid cached token', async () => {
   config.get.mockImplementation(() => {
     let tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = jwtToken
+    tempConfig.pk_checksum = '70cc9abdc947cbb3b86c771cdf082c83'
     return tempConfig
   })
 
@@ -63,10 +64,30 @@ test('valid cached token', async () => {
   })
 })
 
+test('valid cached token with bad checksum', async () => {
+  config.get.mockImplementation(() => {
+    let tempConfig = Object.assign({}, mockConfigData)
+    tempConfig.access_token = jwtToken
+    tempConfig.pk_checksum = 'asd'
+    return tempConfig
+  })
+
+  let runResult = AccessTokenCommand.run([])
+  expect.assertions(4)
+
+  expect(runResult instanceof Promise).toBeTruthy()
+  return runResult.then(res => {
+    expect(res).toEqual(mockAccessToken)
+    expect(config.get).toHaveBeenCalled()
+    expect(config.set).toHaveBeenCalled()
+  })
+})
+
 test('invalid cached token', async () => {
   config.get.mockImplementation(() => {
     let tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = 'not valid'
+    tempConfig.pk_checksum = 'asd'
     return tempConfig
   })
 
@@ -195,6 +216,7 @@ test('generated valid cached token', async () => {
   config.get.mockImplementation(() => {
     let tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = jwtToken
+    tempConfig.pk_checksum = '70cc9abdc947cbb3b86c771cdf082c83'
     return tempConfig
   })
 
