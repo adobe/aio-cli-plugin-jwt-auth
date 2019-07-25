@@ -25,7 +25,7 @@ cli.prompt = jest.fn()
 
 const fetch = require('node-fetch')
 const fs = require('fs')
-const config = require('@adobe/aio-cli-config')
+const config = require('@adobe/aio-cna-core-config')
 const AccessTokenCommand = require('../../../src/commands/jwt-auth/access-token')
 const mockConfigData = require('../../__fixtures__/config/config-sample.json')
 const mockConfigDataWithPassphrase = require('../../__fixtures__/config/config-sample-passphrase.json')

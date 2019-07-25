@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command, flags } = require('@oclif/command')
-const config = require('@adobe/aio-cli-config')
+const config = require('@adobe/aio-cna-core-config')
 const { validateToken, createJwtAuthConfig, validateConfigData } = require('../../jwt-auth-helpers')
 const { cli } = require('cli-ux')
 const auth = require('@adobe/jwt-auth')
