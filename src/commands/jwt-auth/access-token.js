@@ -105,7 +105,7 @@ class AccessTokenCommand extends Command {
       data = await getAccessToken(flags.passphrase, flags.force, !flags['no-prompt'] || flags.passphrase)
     } catch (error) {
       debug(error)
-      this.error(error)
+      this.error(error.message)
     }
     if (flags.bare) {
       this.log(data.token)
