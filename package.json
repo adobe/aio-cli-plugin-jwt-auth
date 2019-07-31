@@ -5,7 +5,7 @@
   "description": "JWT Auth Plugin for the Adobe I/O CLI",
   "bugs": "https://github.com/adobe/aio-cli-plugin-jwt-auth/issues",
   "dependencies": {
-    "@adobe/aio-cna-core-config": "^1.0.13",
+    "@adobe/aio-cna-core-config": "^1.0.14",
     "@adobe/jwt-auth": "^0.2.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
