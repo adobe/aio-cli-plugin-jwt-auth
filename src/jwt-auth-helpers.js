@@ -23,7 +23,7 @@ function createJwtAuthConfig (configData, passphrase) {
     return
   }
 
-  let config = {
+  const config = {
     orgId: payload.iss,
     technicalAccountId: payload.sub,
     clientId: configData.client_id,

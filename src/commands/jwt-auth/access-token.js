@@ -16,18 +16,18 @@ const { validateToken, createJwtAuthConfig, validateConfigData } = require('../.
 const { cli } = require('cli-ux')
 const auth = require('@adobe/jwt-auth')
 const debug = require('debug')('aio-cli-plugin-jwt-auth')
-let crypto = require('crypto')
+const crypto = require('crypto')
 
 async function getToken (jwtConfig) {
   const body = await auth(jwtConfig)
 
-  let expires = (new Date(Date.now() + body.expires_in)).toString()
+  const expires = (new Date(Date.now() + body.expires_in)).toString()
   config.set('jwt-auth.access_token', body.access_token)
   config.set('jwt-auth.access_token_expiry', expires)
 
   // whenever we get a token, we store a checksum of the private key we used
   // to create it, so we can detect tokens invalidated by changing the private key.
-  let genCheckSum = crypto.createHash('md5')
+  const genCheckSum = crypto.createHash('md5')
     .update(jwtConfig.privateKey)
     .digest('hex')
   config.set('jwt-auth.pk_checksum', genCheckSum)
@@ -47,15 +47,15 @@ async function getAccessToken (passphrase = '', force, prompt) {
     return Promise.reject(new Error(`missing config data: ${validateConfigResults.join(', ')}`))
   }
 
-  let token = configData.access_token
-  let expires = configData.access_token_expiry
-  let jwtConfig = createJwtAuthConfig(configData, passphrase)
+  const token = configData.access_token
+  const expires = configData.access_token_expiry
+  const jwtConfig = createJwtAuthConfig(configData, passphrase)
 
   if (!force && token) {
     // first verify that checksum matches the privateKey
     // if not we need to request a new token
-    let lastchecksum = configData.pk_checksum
-    let newchecksum = crypto.createHash('md5')
+    const lastchecksum = configData.pk_checksum
+    const newchecksum = crypto.createHash('md5')
       .update(jwtConfig.privateKey)
       .digest('hex')
 
@@ -110,7 +110,7 @@ class AccessTokenCommand extends Command {
     if (flags.bare) {
       this.log(data.token)
     } else {
-      let expiryRange = ((new Date(data.expires) - Date.now()) / 1000 / 60 / 60).toFixed(2)
+      const expiryRange = ((new Date(data.expires) - Date.now()) / 1000 / 60 / 60).toFixed(2)
       this.log(`Access Token: ${data.token}`)
       this.log(`Expiry: ${data.expires} (${expiryRange} hrs)`)
     }

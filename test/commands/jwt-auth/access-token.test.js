@@ -32,8 +32,8 @@ const mockConfigDataWithPassphrase = require('../../__fixtures__/config/config-s
 const configDataPassphrase = 'password'
 const jwt = require('jsonwebtoken')
 
-let privateKey = mockConfigData.jwt_private_key.join('\n')
-let payload = mockConfigData.jwt_payload
+const privateKey = mockConfigData.jwt_private_key.join('\n')
+const payload = mockConfigData.jwt_payload
 // always set to expire 24 hours in the future
 payload.created_at = Math.round(Date.now())
 payload.expires_in = 1000000 // hurry!
@@ -47,13 +47,13 @@ const jwtToken = jwt.sign(payload, privateKey, { algorithm: 'RS256' }, null)
 
 test('valid cached token', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = jwtToken
     tempConfig.pk_checksum = '70cc9abdc947cbb3b86c771cdf082c83'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   expect.assertions(4)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -66,13 +66,13 @@ test('valid cached token', async () => {
 
 test('valid cached token with bad checksum', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = jwtToken
     tempConfig.pk_checksum = 'asd'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   expect.assertions(4)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -85,13 +85,13 @@ test('valid cached token with bad checksum', async () => {
 
 test('invalid cached token', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = 'not valid'
     tempConfig.pk_checksum = 'asd'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   expect.assertions(4)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -104,12 +104,12 @@ test('invalid cached token', async () => {
 
 test('use bare', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = mockAccessToken
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run(['-b'])
+  const runResult = AccessTokenCommand.run(['-b'])
   expect.assertions(4)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -122,12 +122,12 @@ test('use bare', async () => {
 
 test('call function directly', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = mockAccessToken
     return tempConfig
   })
 
-  let runResult = (new AccessTokenCommand()).accessToken()
+  const runResult = (new AccessTokenCommand()).accessToken()
   expect.assertions(2)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -138,12 +138,12 @@ test('call function directly', async () => {
 
 test('uses key filepath', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.jwt_private_key = 'test/__fixtures__/fake_cert'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
 
   expect(runResult instanceof Promise).toBeTruthy()
   return runResult.then(res => {
@@ -155,12 +155,12 @@ test('uses key filepath', async () => {
 
 test('uses key raw test', async () => {
   config.get.mockImplementation(key => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.jwt_private_key = fs.readFileSync('./test/__fixtures__/fake_cert', 'utf-8')
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
 
   expect(runResult instanceof Promise).toBeTruthy()
   return runResult.then(res => {
@@ -172,12 +172,12 @@ test('uses key raw test', async () => {
 
 test('uses key raw test - cert not found', async (done) => {
   config.get.mockImplementation(key => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.jwt_private_key = './test/__fixtures__/non_existent_cert'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
 
   expect(runResult instanceof Promise).toBeTruthy()
   return runResult
@@ -191,12 +191,12 @@ test('uses key raw test - cert not found', async (done) => {
 
 test('uses key filepath but no file', async (done) => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.jwt_private_key = '/doesntexist'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   expect(runResult instanceof Promise).toBeTruthy()
   return runResult.then(done.fail).catch(err => {
     expect(err).toEqual(new Error('Cannot load private key: /doesntexist'))
@@ -205,8 +205,8 @@ test('uses key filepath but no file', async (done) => {
 })
 
 test('generated valid cached token', async () => {
-  let privateKey = mockConfigData.jwt_private_key.join('\n')
-  let payload = mockConfigData.jwt_payload
+  const privateKey = mockConfigData.jwt_private_key.join('\n')
+  const payload = mockConfigData.jwt_payload
   // always set to expire 24 hours in the future
   payload.created_at = Math.round(Date.now())
   payload.expires_in = 1000000 // hurry!
@@ -214,13 +214,13 @@ test('generated valid cached token', async () => {
   const jwtToken = jwt.sign(payload, privateKey, { algorithm: 'RS256' }, null)
 
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     tempConfig.access_token = jwtToken
     tempConfig.pk_checksum = '70cc9abdc947cbb3b86c771cdf082c83'
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   expect.assertions(3)
 
   expect(runResult instanceof Promise).toBeTruthy()
@@ -235,7 +235,7 @@ test('config missing jwt-auth key', async (done) => {
     return undefined
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   return runResult.then(done.fail).catch(err => {
     expect(err).toEqual(new Error('missing config data: jwt-auth'))
     done()
@@ -247,7 +247,7 @@ test('config missing key in jwt-auth key', async (done) => {
     return { 'jwt-auth': {} }
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   return runResult.then(done.fail).catch(err => {
     expect(config.get).toHaveBeenCalled()
     expect(err).toEqual(new Error('missing config data: jwt_private_key, jwt_payload, client_id, client_secret'))
@@ -257,11 +257,11 @@ test('config missing key in jwt-auth key', async (done) => {
 
 test('no cached access_token', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   return runResult.then(data => {
     expect(config.get).toHaveBeenCalled()
     expect(config.set).toHaveBeenCalled()
@@ -271,12 +271,12 @@ test('no cached access_token', async () => {
 
 test('should default to https://ims-na1.adobelogin.com/ims/exchange/jwt/', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigData)
+    const tempConfig = Object.assign({}, mockConfigData)
     delete tempConfig.token_exchange_url
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   return runResult.then(data => {
     expect(config.get).toHaveBeenCalled()
     expect(config.set).toHaveBeenCalled()
@@ -287,11 +287,11 @@ test('should default to https://ims-na1.adobelogin.com/ims/exchange/jwt/', async
 
 test('private-key has passphrase - passphrase not set, should prompt', async (done) => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([])
+  const runResult = AccessTokenCommand.run([])
   return runResult
     .then(done.fail)
     .catch(data => {
@@ -303,11 +303,11 @@ test('private-key has passphrase - passphrase not set, should prompt', async (do
 
 test('private-key has passphrase - passphrase set, shouldnt prompt if --no-prompt', async (done) => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([`--no-prompt`])
+  const runResult = AccessTokenCommand.run([`--no-prompt`])
   return runResult
     .then(done.fail)
     .catch(data => {
@@ -319,11 +319,11 @@ test('private-key has passphrase - passphrase set, shouldnt prompt if --no-promp
 
 test('private-key has passphrase - passphrase set', async () => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
     return tempConfig
   })
 
-  let runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
+  const runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
   return runResult.then(data => {
     expect(config.get).toHaveBeenCalled()
     expect(config.set).toHaveBeenCalled()
@@ -333,7 +333,7 @@ test('private-key has passphrase - passphrase set', async () => {
 
 test('fetch failure', async (done) => {
   config.get.mockImplementation(() => {
-    let tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
     return tempConfig
   })
 
@@ -349,7 +349,7 @@ test('fetch failure', async (done) => {
   }
   mockResult = Promise.resolve(response)
 
-  let runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
+  const runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
   return runResult.then(done.fail).catch(err => {
     expect(err.message).toEqual(`An unknown error occurred while swapping jwt. The response is as follows: ${JSON.stringify(obj)}`)
     done()
