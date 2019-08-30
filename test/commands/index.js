@@ -16,6 +16,6 @@ describe('index', () => {
   })
 
   test('return accessToken', () => {
-    expect(index.accessToken()).resolves.toBe('1234')
+    return expect(index.accessToken()).resolves.toBe('1234')
   })
 })
