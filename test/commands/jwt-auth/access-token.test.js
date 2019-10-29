@@ -170,37 +170,58 @@ test('uses key raw test', async () => {
   })
 })
 
-test('uses key raw test - cert not found', async (done) => {
-  config.get.mockImplementation(key => {
-    const tempConfig = Object.assign({}, mockConfigData)
-    tempConfig.jwt_private_key = './test/__fixtures__/non_existent_cert'
-    return tempConfig
-  })
-
-  const runResult = AccessTokenCommand.run([])
-
-  expect(runResult instanceof Promise).toBeTruthy()
-  return runResult
-    .then(() => done.fail())
-    .catch(res => {
-      expect(res).toEqual(new Error('Cannot load private key: ./test/__fixtures__/non_existent_cert'))
-      expect(config.get).toHaveBeenCalled()
-      done()
+test('uses key raw test - cert not found', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(key => {
+      const tempConfig = Object.assign({}, mockConfigData)
+      tempConfig.jwt_private_key = './test/__fixtures__/non_existent_cert'
+      return tempConfig
     })
+
+    const runResult = AccessTokenCommand.run([])
+
+    expect(runResult instanceof Promise).toBeTruthy()
+    return runResult
+      .then(reject)
+      .catch(res => {
+        expect(res).toEqual(new Error('Cannot load private key: ./test/__fixtures__/non_existent_cert'))
+        expect(config.get).toHaveBeenCalled()
+        resolve()
+      })
+  })
 })
 
-test('uses key filepath but no file', async (done) => {
-  config.get.mockImplementation(() => {
-    const tempConfig = Object.assign({}, mockConfigData)
-    tempConfig.jwt_private_key = '/doesntexist'
-    return tempConfig
-  })
+test('general @adobe/jwt-auth error', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      const tempConfig = Object.assign({}, mockConfigData)
+      tempConfig.jwt_private_key = tempConfig.jwt_private_key + 'gibberish'
+      return tempConfig
+    })
 
-  const runResult = AccessTokenCommand.run([])
-  expect(runResult instanceof Promise).toBeTruthy()
-  return runResult.then(done.fail).catch(err => {
-    expect(err).toEqual(new Error('Cannot load private key: /doesntexist'))
-    done()
+    const runResult = AccessTokenCommand.run([])
+    expect(runResult instanceof Promise).toBeTruthy()
+    return runResult.then(reject).catch(err => {
+      expect(err).toBeDefined()
+      resolve()
+    })
+  })
+})
+
+test('uses key filepath but no file', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      const tempConfig = Object.assign({}, mockConfigData)
+      tempConfig.jwt_private_key = '/doesntexist'
+      return tempConfig
+    })
+
+    const runResult = AccessTokenCommand.run([])
+    expect(runResult instanceof Promise).toBeTruthy()
+    return runResult.then(reject).catch(err => {
+      expect(err).toEqual(new Error('Cannot load private key: /doesntexist'))
+      resolve()
+    })
   })
 })
 
@@ -230,28 +251,32 @@ test('generated valid cached token', async () => {
   })
 })
 
-test('config missing jwt-auth key', async (done) => {
-  config.get.mockImplementation(() => {
-    return undefined
-  })
+test('config missing jwt-auth key', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      return undefined
+    })
 
-  const runResult = AccessTokenCommand.run([])
-  return runResult.then(done.fail).catch(err => {
-    expect(err).toEqual(new Error('missing config data: jwt-auth'))
-    done()
+    const runResult = AccessTokenCommand.run([])
+    return runResult.then(reject).catch(err => {
+      expect(err).toEqual(new Error('missing config data: jwt-auth'))
+      resolve()
+    })
   })
 })
 
-test('config missing key in jwt-auth key', async (done) => {
-  config.get.mockImplementation(() => {
-    return { 'jwt-auth': {} }
-  })
+test('config missing key in jwt-auth key', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      return { 'jwt-auth': {} }
+    })
 
-  const runResult = AccessTokenCommand.run([])
-  return runResult.then(done.fail).catch(err => {
-    expect(config.get).toHaveBeenCalled()
-    expect(err).toEqual(new Error('missing config data: jwt_private_key, jwt_payload, client_id, client_secret'))
-    done()
+    const runResult = AccessTokenCommand.run([])
+    return runResult.then(reject).catch(err => {
+      expect(config.get).toHaveBeenCalled()
+      expect(err).toEqual(new Error('missing config data: jwt_private_key, jwt_payload, client_id, client_secret'))
+      resolve()
+    })
   })
 })
 
@@ -285,36 +310,40 @@ test('should default to https://ims-na1.adobelogin.com/ims/exchange/jwt/', async
   })
 })
 
-test('private-key has passphrase - passphrase not set, should prompt', async (done) => {
-  config.get.mockImplementation(() => {
-    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
-    return tempConfig
-  })
-
-  const runResult = AccessTokenCommand.run([])
-  return runResult
-    .then(done.fail)
-    .catch(data => {
-      expect(config.get).toHaveBeenCalled()
-      expect(cli.prompt).toHaveBeenCalled()
-      done()
+test('private-key has passphrase - passphrase not set, should prompt', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+      return tempConfig
     })
+
+    const runResult = AccessTokenCommand.run([])
+    return runResult
+      .then(reject)
+      .catch(data => {
+        expect(config.get).toHaveBeenCalled()
+        expect(cli.prompt).toHaveBeenCalled()
+        resolve()
+      })
+  })
 })
 
-test('private-key has passphrase - passphrase set, shouldnt prompt if --no-prompt', async (done) => {
-  config.get.mockImplementation(() => {
-    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
-    return tempConfig
-  })
-
-  const runResult = AccessTokenCommand.run([`--no-prompt`])
-  return runResult
-    .then(done.fail)
-    .catch(data => {
-      expect(config.get).toHaveBeenCalled()
-      expect(cli.prompt).not.toHaveBeenCalled()
-      done()
+test('private-key has passphrase - passphrase set, shouldnt prompt if --no-prompt', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+      return tempConfig
     })
+
+    const runResult = AccessTokenCommand.run([`--no-prompt`])
+    return runResult
+      .then(reject)
+      .catch(data => {
+        expect(config.get).toHaveBeenCalled()
+        expect(cli.prompt).not.toHaveBeenCalled()
+        resolve()
+      })
+  })
 })
 
 test('private-key has passphrase - passphrase set', async () => {
@@ -331,27 +360,29 @@ test('private-key has passphrase - passphrase set', async () => {
   })
 })
 
-test('fetch failure', async (done) => {
-  config.get.mockImplementation(() => {
-    const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
-    return tempConfig
-  })
+test('fetch failure', async () => {
+  await new Promise((resolve, reject) => {
+    config.get.mockImplementation(() => {
+      const tempConfig = Object.assign({}, mockConfigDataWithPassphrase)
+      return tempConfig
+    })
 
-  const obj = {
-    ok: false,
-    status: 404,
-    statusText: 'Not Found'
-  }
+    const obj = {
+      ok: false,
+      status: 404,
+      statusText: 'Not Found'
+    }
 
-  const response = {
-    ...obj,
-    json: () => obj
-  }
-  mockResult = Promise.resolve(response)
+    const response = {
+      ...obj,
+      json: () => obj
+    }
+    mockResult = resolve(response)
 
-  const runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
-  return runResult.then(done.fail).catch(err => {
-    expect(err.message).toEqual(`An unknown error occurred while swapping jwt. The response is as follows: ${JSON.stringify(obj)}`)
-    done()
+    const runResult = AccessTokenCommand.run([`--passphrase=${configDataPassphrase}`])
+    return runResult.then(reject).catch(err => {
+      expect(err.message).toEqual(`An unknown error occurred while swapping jwt. The response is as follows: ${JSON.stringify(obj)}`)
+      resolve()
+    })
   })
 })
