@@ -29,4 +29,3 @@ test('sdk init test', async () => {
 
   console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
 });
-4084663469
