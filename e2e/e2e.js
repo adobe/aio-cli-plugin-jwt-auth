@@ -15,14 +15,10 @@ const { stdout } = require('stdout-stderr')
 
 stdout.print = true 
 
-test('sdk init test', async () => {
+test('Generate jwt-auth access token test', async () => {
 
   const name = 'aio-cli-plugin-jwt-auth'
   console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
-
-  console.log(chalk.dim(`    - create jwt-auth config...`))
-  const homedir = require('os').homedir()
-  execa.sync('node', [homedir+'/.npm-global/bin/aio', 'config', 'set', 'jwt-auth', '--json', '--file', 'e2e/jwt_auth_config.json'], { stderr: 'inherit' })
 
   console.log(chalk.dim(`    - Generate jwt-auth access token..`))
   execa.sync('./bin/run', ['jwt-auth:access-token'], { stderr: 'inherit' })
