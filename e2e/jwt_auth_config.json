@@ -1,0 +1,10 @@
+"client_id": "....",
+"client_secret": "...",
+"jwt_payload": {
+  "iss": "...@AdobeOrg",
+  "sub": "...@techacct.adobe.com",
+  "...": true,
+  "...": true,
+  "aud": "...."
+},
+"jwt_private_key": "/path/to/cert"
