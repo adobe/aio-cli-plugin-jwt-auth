@@ -14,16 +14,15 @@ const chalk = require('chalk')
 const { stdout } = require('stdout-stderr')
 const fs = require('fs')
 
-stdout.print = true 
+stdout.print = true
 
 test('Generate jwt-auth access token test', async () => {
-
   const packagejson = JSON.parse(fs.readFileSync('package.json').toString())
   const name = `${packagejson.name}`
   console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
 
   console.log(chalk.dim(`    - Generate jwt-auth access token..`))
-  expect(() => {execa.sync('./bin/run', ['jwt-auth:access-token'], { stderr: 'inherit' }) }).not.toThrow()
+  expect(() => { execa.sync('./bin/run', ['jwt-auth:access-token'], { stderr: 'inherit' }) }).not.toThrow()
 
   console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
-});
+})

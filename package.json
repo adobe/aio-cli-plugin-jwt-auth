@@ -63,7 +63,7 @@
   "scripts": {
     "test": "npm run unit-tests",
     "pretest": "npm run eslint",
-    "eslint": "eslint src test",
+    "eslint": "eslint src test e2e",
     "unit-tests": "jest --ci",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
