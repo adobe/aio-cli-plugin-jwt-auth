@@ -16,7 +16,8 @@ let mockResult = Promise.resolve({
   ok: true,
   json: () => Promise.resolve(
     { access_token: mockAccessToken, expires_in: Date.now() }
-  ) })
+  )
+})
 jest.mock('node-fetch', () => jest.fn().mockImplementation(() => mockResult))
 
 const { cli } = require('cli-ux')
@@ -335,7 +336,7 @@ test('private-key has passphrase - passphrase set, shouldnt prompt if --no-promp
       return tempConfig
     })
 
-    const runResult = AccessTokenCommand.run([`--no-prompt`])
+    const runResult = AccessTokenCommand.run(['--no-prompt'])
     return runResult
       .then(reject)
       .catch(data => {
