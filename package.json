@@ -56,7 +56,8 @@
       "jwt-auth": {
         "description": "Gets the access token for an integration for the Adobe I/O Runtime"
       }
-    }
+    },
+    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
   "main": "src/index.js",
   "repository": "adobe/aio-cli-plugin-jwt-auth",
