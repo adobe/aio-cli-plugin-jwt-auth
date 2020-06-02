@@ -33,7 +33,7 @@ $ npm install -g @adobe/aio-cli-plugin-jwt-auth
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-jwt-auth/2.0.3 darwin-x64 node-v10.18.1
+@adobe/aio-cli-plugin-jwt-auth/2.0.4 darwin-x64 node-v10.18.1
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -78,5 +78,5 @@ EXAMPLE
   }
 ```
 
-_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/2.0.3/src/commands/jwt-auth/access-token.js)_
+_See code: [src/commands/jwt-auth/access-token.js](https://github.com/adobe/aio-cli-plugin-jwt-auth/blob/2.0.4/src/commands/jwt-auth/access-token.js)_
 <!-- commandsstop -->
